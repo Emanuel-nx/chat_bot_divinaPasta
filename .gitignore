@@ -1,0 +1,6 @@
+.venv/
+.env
+cardapio.pdf
+chatbot.log
+__pycache__/
+flask_session/
