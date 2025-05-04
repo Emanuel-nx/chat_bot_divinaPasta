@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot Divina Pasta</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #fffaf0, #fce4ec);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            width: 100%;
+            background-color: #8e44ad;
+            color: white;
+            text-align: center;
+            padding: 20px 0;
+            font-size: 1.8em;
+            font-weight: bold;
+        }
+        .chat-container {
+            width: 100%;
+            max-width: 700px;
+            background-color: #ffffff;
+            margin-top: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            padding: 20px;
+        }
+        .message {
+            margin: 10px 0;
+            padding: 12px 18px;
+            border-radius: 20px;
+            max-width: 80%;
+            word-wrap: break-word;
+            line-height: 1.4em;
+        }
+        .user-message {
+            background-color: #d1f0e1;
+            align-self: flex-end;
+            text-align: right;
+        }
+        .bot-message {
+            background-color: #f0f0f0;
+            align-self: flex-start;
+        }
+        .input-container {
+            display: flex;
+            margin-top: 20px;
+            width: 100%;
+            max-width: 700px;
+        }
+        input[type="text"] {
+            flex: 1;
+            padding: 12px 15px;
+            border: 2px solid #ccc;
+            border-radius: 25px;
+            font-size: 1em;
+            outline: none;
+            transition: border 0.3s;
+        }
+        input[type="text"]:focus {
+            border-color: #8e44ad;
+        }
+        button {
+            margin-left: 10px;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 25px;
+            background: linear-gradient(135deg, #8e44ad, #9b59b6);
+            color: white;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            transition: background 0.3s, transform 0.2s;
+        }
+        button:hover {
+            background: linear-gradient(135deg, #9b59b6, #af7ac5);
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <header>Divina Pasta 🍝</header>
+
+    <div class="chat-container" id="chat">
+        <div class="message bot-message">Bem-vindo à Divina Pasta! 😊 Digite algo para começar (ex: 'ola', 'oi').</div>
+    </div>
+
+    <div class="input-container">
+        <input type="text" id="pergunta" placeholder="Digite sua pergunta...">
+        <button onclick="enviarPergunta()">Enviar</button>
+        <button onclick="limparChat()">Limpar</button>
+    </div>
+
+    <script>
+        async function enviarPergunta() {
+            const perguntaInput = document.getElementById('pergunta');
+            const pergunta = perguntaInput.value.trim();
+            if (!pergunta) return;
+    
+            adicionarMensagem(pergunta, 'user-message');
+            perguntaInput.value = '';
+    
+            try {
+                const response = await fetch('/perguntar', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ pergunta })
+                });
+                const data = await response.json();
+                adicionarMensagem(data.resposta, 'bot-message');
+            } catch (error) {
+                adicionarMensagem('❌ Erro ao enviar mensagem. Tente novamente.', 'bot-message');
+            }
+        }
+    
+        function adicionarMensagem(texto, classe) {
+            const chat = document.getElementById('chat');
+            const mensagemDiv = document.createElement('div');
+            mensagemDiv.classList.add('message', classe);
+            mensagemDiv.innerHTML = texto;
+            chat.appendChild(mensagemDiv);
+            chat.scrollTop = chat.scrollHeight;
+        }
+    
+        function limparChat() {
+            const chat = document.getElementById('chat');
+            chat.innerHTML = '<div class="message bot-message">Chat limpo! Comece uma nova conversa. 😊</div>';
+        }
+    
+        // Adiciona ENTER para enviar
+        document.getElementById('pergunta').addEventListener('keydown', function(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                enviarPergunta();
+            }
+        });
+    </script>
+    
+</body>
+</html>
